@@ -456,8 +456,11 @@ class TaskSession(MiddlemanSafeSession, ResourceHandshakeSessionMixin):
 
     def _react_to_want_to_compute_task(self, msg):
         if self.task_server.should_accept_provider(self.key_id):
+
             if self._handshake_required(self.key_id):
                 return self._start_handshake(self.key_id)
+            elif self._handshake_in_progress(self.key_id):
+                return
 
             ctd, wrong_task, wait = self.task_manager.get_next_subtask(
                 self.key_id, msg.node_name, msg.task_id, msg.perf_index,

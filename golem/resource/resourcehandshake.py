@@ -160,6 +160,13 @@ class ResourceHandshakeSessionMixin:
         blocked = self._is_peer_blocked(key_id)
         return not (handshake or blocked)
 
+    def _handshake_in_progress(self, key_id):
+        if not key_id:
+            return self._handshake_error(key_id, 'empty key_id')
+
+        handshake = self._get_handshake(key_id)
+        return handshake and not handshake.finished()
+
     def _start_handshake(self, key_id, session_data=None):
         handshake = ResourceHandshake(key_id, session_data)
         directory = self.resource_manager.storage.get_dir(self.__sub_dir)
