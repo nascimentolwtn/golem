@@ -41,8 +41,8 @@ class ResourceHandshake:
         with open(nonce_file, 'r') as f:
             return f.read().strip()
 
-    def start(self, directory, local_nonce=None):
-        self.nonce = local_nonce or str(uuid.uuid4())
+    def start(self, directory, nonce=None):
+        self.nonce = nonce or str(uuid.uuid4())
         self.file = os.path.join(directory, self.nonce)
         self.status = ResourceHandshakeStatus.STARTED
 
@@ -70,9 +70,8 @@ class ResourceHandshakeSessionMixin:
 
     HANDSHAKE_TIMEOUT = 20  # s
 
-    DCRPrematureResourceHandshake = 'Premature resource handshake'
-    DCRResourceHandshakeTimeout = 'Handshake timeout'
-    DCRResourceHandshakeFailure = 'Handshake failure'
+    DCRResourceHandshakeTimeout = 'Resource handshake timeout'
+    DCRResourceHandshakeFailure = 'Resource handshake failure'
 
     __sub_dir = 'nonces'
     __task_id = 'nonce'
@@ -85,13 +84,13 @@ class ResourceHandshakeSessionMixin:
 
         self._handshake_timer = None
 
-    def request_task(self, node_name, task_id, performance_index, price,
+    def request_task(self, node_name, task_id, perf_index, price,
                      max_resource_size, max_memory_size, num_cores):
 
         """ Inform that node wants to compute given task
         :param str node_name: name of that node
         :param uuid task_id: if of a task that node wants to compute
-        :param float performance_index: benchmark result for this task type
+        :param float perf_index: benchmark result for this task type
         :param float price: price for an hour
         :param int max_resource_size: how much disk space can this node offer
         :param int max_memory_size: how much ram can this node offer
@@ -103,7 +102,7 @@ class ResourceHandshakeSessionMixin:
         message = dict(
             node_name=node_name,
             task_id=task_id,
-            perf_index=performance_index,
+            perf_index=perf_index,
             price=price,
             max_resource_size=max_resource_size,
             max_memory_size=max_memory_size,
@@ -190,8 +189,9 @@ class ResourceHandshakeSessionMixin:
                                                 self._handshake_timeout)
 
     # ########################
-    #     FINISH HANDSHAKE
+    #    COMPLETE HANDSHAKE
     # ########################
+
     def _complete_handshake(self, key_id):
         handshake = self._get_handshake(key_id)
         if handshake and handshake.success() and handshake.message:
