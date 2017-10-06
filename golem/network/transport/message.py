@@ -1266,8 +1266,8 @@ class MessageResourceHandshakeVerdict(Message):
     }
 
     def __init__(self,
-                 accepted: Optional[bool]=False,
                  nonce: Optional[str]=None,
+                 accepted: Optional[bool] = False,
                  **kwargs):
 
         self.nonce = nonce
